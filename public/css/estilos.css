@@ -1,0 +1,17 @@
+ #mensagens, #usuarios {
+	width: 500px;
+	float: left;
+	height: 400px;
+	border: 1px solid black;
+	padding: 5px;
+	overflow: scroll;
+	overflow-x: hidden;
+}
+
+#usuarios {
+	width: 200px;
+}
+
+#frmMensagens {
+	clear: both;
+}

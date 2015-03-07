@@ -1,0 +1,69 @@
+html
+  head
+    title Chat
+    style
+      include css/estilos.css
+  body
+    #telaUserName
+      form(id="informeUsuario")
+        h3 Escreva seu nick
+        input(type="text", size="30", id="nickname", placeholder="Digite seu nick", required)
+        input(type="submit", value="Entrar")
+    #salaChat
+      #mensagens
+      
+      #usuarios
+
+      form(id="frmMensagens")
+        input(type="text", size="40", id="mensagem", required)
+        input(type="submit", value="Enviar")
+    script(type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js")
+    script(type="text/javascript" src="/socket.io/socket.io.js")
+    script(type="text/javascript").
+      $(function(){
+        var socket = io.connect();
+        var salaChat = $("#salaChat");
+        var telaUserName = $("#telaUserName");
+        var informeUsuario = $("#informeUsuario");
+        var frmMensagens = $("#frmMensagens");
+        var mensagem = $("#mensagem");
+        var divMensagens = $("#mensagens");
+        var divUsuarios = $("#usuarios");
+        var nickname = $("#nickname");
+
+        salaChat.hide();
+
+        informeUsuario.submit(function(e){
+          e.preventDefault();
+          socket.emit("novo usuario", nickname.val(), function(data){
+            if (data.retorno) {
+              telaUserName.hide();
+              salaChat.show();
+              mensagem.focus();
+
+            } else {
+              alert(data.msg);
+              nickname.val("");
+            }
+          });
+        });
+
+        frmMensagens.submit(function(e){
+          e.preventDefault();
+          socket.emit("enviar mensagem", mensagem.val());
+          mensagem.val("");
+        });
+
+        socket.on("nova mensagem", function(data){
+          divMensagens.append("<strong>"+data.nick+"</strong>"+data.msg+"<br/>");
+        });
+
+        socket.on("atualiza usuarios", function(usuarios){
+          var listaUsuarios = "<ul>";
+          $.each(usuarios, function(val, key){
+            listaUsuarios += "<li>"+key+"</li>";
+          });
+          listaUsuarios += "</ul>";
+          divUsuarios.empty().append(listaUsuarios);
+        });
+      });
